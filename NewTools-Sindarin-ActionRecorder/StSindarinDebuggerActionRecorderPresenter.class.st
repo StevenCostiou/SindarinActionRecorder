@@ -6,7 +6,8 @@ Class {
 	#instVars : [
 		'toolbar',
 		'registry',
-		'table'
+		'table',
+		'events'
 	],
 	#category : 'NewTools-Sindarin-ActionRecorder',
 	#package : 'NewTools-Sindarin-ActionRecorder'
@@ -25,10 +26,23 @@ StSindarinDebuggerActionRecorderPresenter >> defaultLayout [
 		yourself
 ]
 
+{ #category : 'accessing' }
+StSindarinDebuggerActionRecorderPresenter >> events [
+
+	^ events ifNil: [ events := OrderedCollection new ]
+]
+
+{ #category : 'initialization' }
+StSindarinDebuggerActionRecorderPresenter >> initialize [
+
+	super initialize.
+	self subscribeToActionModel
+]
+
 { #category : 'initialization' }
 StSindarinDebuggerActionRecorderPresenter >> initializePresenters [
 	registry := self newList.
-	registry items: OrderedCollection new.
+	registry items: self events.
 	self initializeToolbar
 ]
 
@@ -42,10 +56,38 @@ StSindarinDebuggerActionRecorderPresenter >> initializeToolbar [
 ]
 
 { #category : 'initialization' }
+StSindarinDebuggerActionRecorderPresenter >> subscribeToActionModel [
+
+	self debugger debuggerActionModel
+		when: StDebuggerActionModelStepAnnouncement
+		send: #updateStep: 
+		to: self";
+		when: StDebuggerActionModelRestartAnnouncement
+		send: #updateRestart
+		to: self;
+		when: StDebuggerActionModelContextChangedAnnouncement
+		send: #updateContextChanged
+		to: self;
+		when: StDebuggerActionModelMethodAddedAnnouncement
+		send: #updateAfterMethodAdded
+		to: self;
+		when: StDebuggerActionModelClearAnnouncement
+		send: #debuggerActionModelCleared
+		to: self"
+]
+
+{ #category : 'initialization' }
 StSindarinDebuggerActionRecorderPresenter >> toolbarActions [
 
 	| group |
 	group := (CmCommandGroup named: 'Toolbar') asSpecGroup.
 	group register: (SindarinSaveActionsCommand forSpecContext: self).
 	^ group
+]
+
+{ #category : 'updating' }
+StSindarinDebuggerActionRecorderPresenter >> updateStep: aStepAnnouncement [
+
+	self events addFirst: aStepAnnouncement.
+	registry items: self events
 ]
