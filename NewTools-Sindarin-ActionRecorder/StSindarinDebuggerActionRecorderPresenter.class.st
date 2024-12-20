@@ -41,7 +41,10 @@ StSindarinDebuggerActionRecorderPresenter >> initialize [
 
 { #category : 'initialization' }
 StSindarinDebuggerActionRecorderPresenter >> initializePresenters [
-	registry := self newList.
+	registry := self newTable.
+	registry addColumn: ((SpStringTableColumn title: 'id' evaluated: [:event | (events indexOf: event ) printString]) width: 30; yourself).
+	registry addColumn: (SpStringTableColumn title: 'Action' evaluated: #yourself).
+	registry addColumn: (SpStringTableColumn title: 'instruction' evaluated: [:event | event node printString]).
 	registry items: self events.
 	self initializeToolbar
 ]
@@ -88,6 +91,6 @@ StSindarinDebuggerActionRecorderPresenter >> toolbarActions [
 { #category : 'updating' }
 StSindarinDebuggerActionRecorderPresenter >> updateStep: aStepAnnouncement [
 
-	self events addFirst: aStepAnnouncement.
-	registry items: self events
+	self events add: aStepAnnouncement.
+	registry items: self events reversed
 ]
