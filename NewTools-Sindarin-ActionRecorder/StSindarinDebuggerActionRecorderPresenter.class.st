@@ -63,20 +63,14 @@ StSindarinDebuggerActionRecorderPresenter >> subscribeToActionModel [
 
 	self debugger debuggerActionModel
 		when: StDebuggerActionModelStepAnnouncement
-		send: #updateStep: 
-		to: self";
+		send: #updateAction:
+		to: self;
 		when: StDebuggerActionModelRestartAnnouncement
-		send: #updateRestart
+		send: #updateAction:
 		to: self;
 		when: StDebuggerActionModelContextChangedAnnouncement
-		send: #updateContextChanged
-		to: self;
-		when: StDebuggerActionModelMethodAddedAnnouncement
-		send: #updateAfterMethodAdded
-		to: self;
-		when: StDebuggerActionModelClearAnnouncement
-		send: #debuggerActionModelCleared
-		to: self"
+		send: #updateAction:
+		to: self
 ]
 
 { #category : 'initialization' }
@@ -89,7 +83,7 @@ StSindarinDebuggerActionRecorderPresenter >> toolbarActions [
 ]
 
 { #category : 'updating' }
-StSindarinDebuggerActionRecorderPresenter >> updateStep: aStepAnnouncement [
+StSindarinDebuggerActionRecorderPresenter >> updateAction: aStepAnnouncement [
 
 	self events add: aStepAnnouncement.
 	registry items: self events reversed
