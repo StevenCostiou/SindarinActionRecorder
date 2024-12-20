@@ -41,10 +41,51 @@ StSindarinDebuggerActionRecorderPresenter >> initialize [
 
 { #category : 'initialization' }
 StSindarinDebuggerActionRecorderPresenter >> initializePresenters [
-	registry := self newTable.
-	registry addColumn: ((SpStringTableColumn title: 'id' evaluated: [:event | (events indexOf: event ) printString]) width: 30; yourself).
-	registry addColumn: (SpStringTableColumn title: 'Action' evaluated: #yourself).
-	registry addColumn: (SpStringTableColumn title: 'instruction' evaluated: [:event | event node printString]).
+	registry := SpColumnViewPresenter new.
+	
+	registry addColumn: (SpColumnViewColumn new 
+			title: 'Action'; 
+			setup: [ :aPresenter |
+				| presenter |
+				(presenter := aPresenter newPresenter)
+					layout: (SpBoxLayout newHorizontal
+						spacing: 5;
+						add: presenter newLabel expand: false;
+						add: presenter newLabel;
+						add: presenter newLabel;
+						yourself);
+					yourself ];
+			bind: [ :aPresenter :event | 
+				| index action node |			
+				index := aPresenter layout children first.
+				index label: (events indexOf: event ) printString.
+				action := aPresenter layout children second.
+				action label: (String streamContents: [:str| event printOn: str]).
+				node := aPresenter layout children third.
+				node label: event node printString.
+				 ];
+			yourself).
+	registry addColumn: (SpColumnViewColumn new
+			title: '';
+			width: 30;
+			setup: [ :aPresenter | | presenter |
+				(presenter := aPresenter newPresenter)
+					layout: (SpBoxLayout newHorizontal
+						hAlignCenter;
+						add: (presenter newButton 
+							addStyle: 'small'; 
+							yourself);
+						yourself);
+					yourself ];
+			bind: [ :aPresenter :event | | button1  |
+				button1 := aPresenter layout children first.
+				button1 
+					icon: (aPresenter iconNamed: #glamorousRestart);
+					action: [ self replayUpTo: event  ].
+				
+					 ];
+			yourself).
+
 	registry items: self events.
 	self initializeToolbar
 ]
