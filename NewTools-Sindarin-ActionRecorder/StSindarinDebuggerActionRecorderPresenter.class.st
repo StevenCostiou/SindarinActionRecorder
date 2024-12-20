@@ -46,6 +46,6 @@ StSindarinDebuggerActionRecorderPresenter >> toolbarActions [
 
 	| group |
 	group := (CmCommandGroup named: 'Toolbar') asSpecGroup.
-	group register: (SindarinRunScriptCommand forSpecContext: self).
+	group register: (SindarinSaveActionsCommand forSpecContext: self).
 	^ group
 ]
